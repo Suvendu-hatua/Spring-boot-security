@@ -45,11 +45,27 @@ public class DemoSecurityConfig {
         ADMIN -------> /students/{studentID}  <----DELETE
      **/
 
+    //***************************************** spring-security-demo-database-plain text ***********************************************************
     //Adding Support for JDBC connections-----> will fetch users from database.
+//    @Bean
+//    public UserDetailsManager userDetailsManager(DataSource dataSource){
+//        return new JdbcUserDetailsManager(dataSource);
+//    }
+
+    //***************************************** spring-security-demo-database-bcrypt ***************************************************
+
+    //****************************** spring-security-demo-database-bcrypt-custom-table-names ***********************************
     @Bean
     public UserDetailsManager userDetailsManager(DataSource dataSource){
-        return new JdbcUserDetailsManager(dataSource);
+        JdbcUserDetailsManager jdbcUserDetailsManager=new JdbcUserDetailsManager(dataSource);
+
+        //// define query to retrieve a user by username
+        jdbcUserDetailsManager.setUsersByUsernameQuery("select * from members where user_id=?");
+        //// define query to retrieve the roles by username
+        jdbcUserDetailsManager.setAuthoritiesByUsernameQuery("select * from roles where user_id=?");
+        return jdbcUserDetailsManager;
     }
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(configurer->
